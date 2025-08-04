@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kirana Management - Customers</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* General Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px 0;
+            height: 100vh;
+            position: fixed;
+        }
+
+        .logo {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid #34495e;
+            margin-bottom: 20px;
+        }
+
+        .logo h2 {
+            color: #fff;
+            font-size: 1.5rem;
+        }
+
+        .nav ul {
+            list-style: none;
+        }
+
+        .nav ul li {
+            margin-bottom: 5px;
+        }
+
+        .nav ul li a {
+            display: block;
+            padding: 12px 20px;
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .nav ul li a:hover {
+            background-color: #34495e;
+            color: white;
+        }
+
+        .nav ul li a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav ul li.active a {
+            background-color: #3498db;
+            color: white;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-bar {
+            display: flex;
+            width: 300px;
+        }
+
+        .search-bar input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+            outline: none;
+        }
+
+        .search-bar button {
+            padding: 10px 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Content Header */
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .content-header h2 {
+            color: #2c3e50;
+            font-size: 1.8rem;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .btn-success {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+
+        .btn-warning {
+            background-color: #f39c12;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: #d35400;
+        }
+
+        /* Table Styles */
+        .customer-table {
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .customer-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .customer-table th, .customer-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .customer-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .customer-table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: 5px;
+            width: 500px;
+            max-width: 90%;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .modal-lg {
+            width: 800px;
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        /* Customer Profile Styles */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .profile-pic {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 20px;
+        }
+
+        .profile-info h3 {
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+
+        .profile-info p {
+            color: #7f8c8d;
+            margin-bottom: 5px;
+        }
+
+        .udhari-amount {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-top: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            border-bottom: 3px solid #3498db;
+            color: #3498db;
+            font-weight: 500;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-amount {
+            font-weight: 500;
+        }
+
+        .credit {
+            color: #e74c3c;
+        }
+
+        .payment {
+            color: #2ecc71;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+                overflow: hidden;
+            }
+            
+            .sidebar .logo h2, .sidebar .nav ul li a span {
+                display: none;
+            }
+        
+            .sidebar .nav ul li a {
+                text-align: center;
+                padding: 15px 0;
+            }
+            
+            .sidebar .nav ul li a i {
+                margin-right: 0;
+                font-size: 1.2rem;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .search-bar {
+                width: 100%;
+            }
+            
+            .content-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .profile-pic {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Kirana Store</h2>
+            </div>
+            <nav class="nav">
+                <ul>
+                    <li><a href="Admin_dashbord.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="products.html"><i class="fas fa-boxes"></i> Products</a></li>
+                    <li class="active"><a href="customers.html"><i class="fas fa-users"></i> Customers</a></li>
+                    <li><a href="billing.html"><i class="fas fa-cash-register"></i> Billing</a></li>
+                     <li><a href="calculater.html"><i class="fas fa-boxes"></i></a></li>
+                    <!-- <li><a href="transactions.html"><i class="fas fa-exchange-alt"></i> Transactions</a></li> -->
+                    <li><a href="reports.html"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div class="search-bar">
+                    <input type="text" placeholder="Search customers..." id="customer-search">
+                    <button><i class="fas fa-search"></i></button>
+                </div>
+                <div class="user-profile">
+                    <span>Admin</span>
+                    <img src="https://via.placeholder.com/40" alt="User">
+                </div>
+            </header>
+
+            <div class="content-header">
+                <h2>Customer Management</h2>
+                <button class="btn btn-primary" id="add-customer-btn">Add Customer</button>
+            </div>
+
+            <div class="customer-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Customer Name</th>
+                            <th>Phone</th>
+                            <th>Total Udhari</th>
+                            <th>Last Transaction</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customer-list">
+                        <!-- Filled by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Add Customer Modal -->
+            <div class="modal" id="customer-modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2 id="modal-title">Add New Customer</h2>
+                    <form id="customer-form">
+                        <input type="hidden" id="customer-id">
+                        <div class="form-group">
+                            <label for="customer-name">Customer Name</label>
+                            <input type="text" id="customer-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="customer-phone">Phone Number</label>
+                            <input type="text" id="customer-phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="customer-address">Address</label>
+                            <textarea id="customer-address" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Customer Profile Modal -->
+            <div class="modal" id="profile-modal">
+                <div class="modal-content modal-lg">
+                    <span class="close">&times;</span>
+                    <div class="profile-header">
+                        <img src="https://via.placeholder.com/80" alt="Customer" class="profile-pic">
+                        <div class="profile-info">
+                            <h3 id="profile-name">Rahul Sharma</h3>
+                            <p id="profile-phone">+91 9876543210</p>
+                            <p id="profile-address">123, Main Street, City</p>
+                            <div class="udhari-amount">Udhari: ₹<span id="udhari-total">0.00</span></div>
+                        </div>
+                    </div>
+
+                    <div class="tabs">
+                        <div class="tab active" data-tab="transactions">Transactions</div>
+                        <div class="tab" data-tab="payments">Payments</div>
+                        <div class="tab" data-tab="new-transaction">New Transaction</div>
+                        <div class="tab" data-tab="new-payment">New Payment</div>
+                    </div>
+
+                    <div class="tab-content active" id="transactions-tab">
+                        <h3>Transaction History</h3>
+                        <div id="transaction-history">
+                            <!-- Filled by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="payments-tab">
+                        <h3>Payment History</h3>
+                        <div id="payment-history">
+                            <!-- Filled by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="new-transaction-tab">
+                        <h3>New Credit Sale</h3>
+                        <form id="transaction-form">
+                            <input type="hidden" id="transaction-customer-id">
+                            <div class="form-group">
+                                <label for="transaction-date">Date</label>
+                                <input type="date" id="transaction-date" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="transaction-amount">Amount (₹)</label>
+                                <input type="number" id="transaction-amount" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="transaction-notes">Notes</label>
+                                <textarea id="transaction-notes" rows="3"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-warning">Record Credit Sale</button>
+                        </form>
+                    </div>
+
+                    <div class="tab-content" id="new-payment-tab">
+                        <h3>New Payment</h3>
+                        <form id="payment-form">
+                            <input type="hidden" id="payment-customer-id">
+                            <div class="form-group">
+                                <label for="payment-date">Date</label>
+                                <input type="date" id="payment-date" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="payment-amount">Amount (₹)</label>
+                                <input type="number" id="payment-amount" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="payment-method">Payment Method</label>
+                                <select id="payment-method" required>
+                                    <option value="Cash">Cash</option>
+                                    <option value="Bank Transfer">Bank Transfer</option>
+                                    <option value="UPI">UPI</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="payment-notes">Notes</label>
+                                <textarea id="payment-notes" rows="3"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-success">Record Payment</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Sample customer data
+        let customers = [
+            { 
+                id: 1, 
+                name: "Rahul Sharma", 
+                phone: "9876543210", 
+                address: "123, Main Street, City",
+                udhari: 2500,
+                transactions: [
+                    { id: 1, date: "2023-05-15", amount: 1200, type: "credit", notes: "Monthly groceries" },
+                    { id: 2, date: "2023-05-20", amount: 800, type: "credit", notes: "Snacks and beverages" },
+                    { id: 3, date: "2023-05-25", amount: 500, type: "payment", method: "Cash", notes: "Partial payment" }
+                ]
+            },
+            { 
+                id: 2, 
+                name: "Priya Patel", 
+                phone: "8765432109", 
+                address: "456, Park Road, Town",
+                udhari: 1500,
+                transactions: [
+                    { id: 1, date: "2023-05-10", amount: 1000, type: "credit", notes: "Household items" },
+                    { id: 2, date: "2023-05-18", amount: 500, type: "credit", notes: "Dairy products" }
+                ]
+            },
+            { 
+                id: 3, 
+                name: "Amit Singh", 
+                phone: "7654321098", 
+                address: "789, Market Lane, Village",
+                udhari: 0,
+                transactions: [
+                    { id: 1, date: "2023-05-05", amount: 750, type: "credit", notes: "Emergency purchase" },
+                    { id: 2, date: "2023-05-12", amount: 750, type: "payment", method: "UPI", notes: "Full payment" }
+                ]
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const customerList = document.getElementById('customer-list');
+            const customerForm = document.getElementById('customer-form');
+            const customerModal = document.getElementById('customer-modal');
+            const profileModal = document.getElementById('profile-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const addCustomerBtn = document.getElementById('add-customer-btn');
+            const closeBtns = document.querySelectorAll('.close');
+            const searchInput = document.getElementById('customer-search');
+            const tabs = document.querySelectorAll('.tab');
+            
+            // Current customer being viewed
+            let currentCustomer = null;
+            
+            // Display all customers
+            function displayCustomers(customersToDisplay = customers) {
+                customerList.innerHTML = '';
+                customersToDisplay.forEach(customer => {
+                    // Calculate last transaction date
+                    let lastTransaction = "None";
+                    if (customer.transactions && customer.transactions.length > 0) {
+                        const sorted = [...customer.transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+                        lastTransaction = sorted[0].date;
+                    }
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${customer.id}</td>
+                        <td>${customer.name}</td>
+                        <td>${customer.phone}</td>
+                        <td>₹${customer.udhari.toFixed(2)}</td>
+                        <td>${lastTransaction}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-primary view-profile" data-id="${customer.id}">Profile</button>
+                                <button class="btn btn-warning edit-customer" data-id="${customer.id}">Edit</button>
+                                <button class="btn btn-danger delete-customer" data-id="${customer.id}">Delete</button>
+                            </div>
+                        </td>
+                    `;
+                    customerList.appendChild(row);
+                });
+                
+                // Add event listeners to view profile buttons
+                document.querySelectorAll('.view-profile').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const customerId = parseInt(this.getAttribute('data-id'));
+                        viewCustomerProfile(customerId);
+                    });
+                });
+                
+                // Add event listeners to edit buttons
+                document.querySelectorAll('.edit-customer').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const customerId = parseInt(this.getAttribute('data-id'));
+                        editCustomer(customerId);
+                    });
+                });
+                
+                // Add event listeners to delete buttons
+                document.querySelectorAll('.delete-customer').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const customerId = parseInt(this.getAttribute('data-id'));
+                        deleteCustomer(customerId);
+                    });
+                });
+            }
+            
+            // View customer profile
+            function viewCustomerProfile(id) {
+                currentCustomer = customers.find(c => c.id === id);
+                if (currentCustomer) {
+                    // Update profile info
+                    document.getElementById('profile-name').textContent = currentCustomer.name;
+                    document.getElementById('profile-phone').textContent = currentCustomer.phone;
+                    document.getElementById('profile-address').textContent = currentCustomer.address;
+                    document.getElementById('udhari-total').textContent = currentCustomer.udhari.toFixed(2);
+                    
+                    // Set hidden fields
+                    document.getElementById('transaction-customer-id').value = currentCustomer.id;
+                    document.getElementById('payment-customer-id').value = currentCustomer.id;
+                    
+                    // Set today's date as default
+                    const today = new Date().toISOString().split('T')[0];
+                    document.getElementById('transaction-date').value = today;
+                    document.getElementById('payment-date').value = today;
+                    
+                    // Load transactions
+                    loadTransactions();
+                    loadPayments();
+                    
+                    // Show profile modal
+                    profileModal.style.display = 'flex';
+                }
+            }
+            
+            // Load transactions
+            function loadTransactions() {
+                if (!currentCustomer) return;
+                
+                const transactionHistory = document.getElementById('transaction-history');
+                transactionHistory.innerHTML = '';
+                
+                const creditTransactions = currentCustomer.transactions.filter(t => t.type === 'credit');
+                
+                if (creditTransactions.length === 0) {
+                    transactionHistory.innerHTML = '<p>No credit transactions found.</p>';
+                    return;
+                }
+                
+                creditTransactions.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(transaction => {
+                    const item = document.createElement('div');
+                    item.className = 'transaction-item';
+                    item.innerHTML = `
+                        <div>
+                            <div>${transaction.date}</div>
+                            <div class="text-muted">${transaction.notes || 'No notes'}</div>
+                        </div>
+                        <div class="transaction-amount credit">₹${transaction.amount.toFixed(2)}</div>
+                    `;
+                    transactionHistory.appendChild(item);
+                });
+            }
+            
+            // Load payments
+            function loadPayments() {
+                if (!currentCustomer) return;
+                
+                const paymentHistory = document.getElementById('payment-history');
+                paymentHistory.innerHTML = '';
+                
+                const payments = currentCustomer.transactions.filter(t => t.type === 'payment');
+                
+                if (payments.length === 0) {
+                    paymentHistory.innerHTML = '<p>No payments found.</p>';
+                    return;
+                }
+                
+                payments.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(payment => {
+                    const item = document.createElement('div');
+                    item.className = 'transaction-item';
+                    item.innerHTML = `
+                        <div>
+                            <div>${payment.date}</div>
+                            <div class="text-muted">${payment.method} - ${payment.notes || 'No notes'}</div>
+                        </div>
+                        <div class="transaction-amount payment">₹${payment.amount.toFixed(2)}</div>
+                    `;
+                    paymentHistory.appendChild(item);
+                });
+            }
+            
+            // Edit customer
+            function editCustomer(id) {
+                const customer = customers.find(c => c.id === id);
+                if (customer) {
+                    modalTitle.textContent = 'Edit Customer';
+                    document.getElementById('customer-id').value = customer.id;
+                    document.getElementById('customer-name').value = customer.name;
+                    document.getElementById('customer-phone').value = customer.phone;
+                    document.getElementById('customer-address').value = customer.address || '';
+                    customerModal.style.display = 'flex';
+                }
+            }
+            
+            // Delete customer
+            function deleteCustomer(id) {
+                if (confirm('Are you sure you want to delete this customer and all their transactions?')) {
+                    customers = customers.filter(c => c.id !== id);
+                    displayCustomers();
+                }
+            }
+            
+            // Save customer (add or update)
+            customerForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const id = document.getElementById('customer-id').value;
+                const name = document.getElementById('customer-name').value;
+                const phone = document.getElementById('customer-phone').value;
+                const address = document.getElementById('customer-address').value;
+                
+                if (id) {
+                    // Update existing customer
+                    const index = customers.findIndex(c => c.id === parseInt(id));
+                    if (index !== -1) {
+                        customers[index] = { 
+                            ...customers[index], 
+                            name, 
+                            phone, 
+                            address 
+                        };
+                    }
+                } else {
+                    // Add new customer
+                    const newId = customers.length > 0 ? Math.max(...customers.map(c => c.id)) + 1 : 1;
+                    customers.push({ 
+                        id: newId, 
+                        name, 
+                        phone, 
+                        address,
+                        udhari: 0,
+                        transactions: [] 
+                    });
+                }
+                
+                displayCustomers();
+                customerModal.style.display = 'none';
+                customerForm.reset();
+            });
+            
+            // Add transaction (credit sale)
+            document.getElementById('transaction-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (!currentCustomer) return;
+                
+                const date = document.getElementById('transaction-date').value;
+                const amount = parseFloat(document.getElementById('transaction-amount').value);
+                const notes = document.getElementById('transaction-notes').value;
+                
+                // Generate transaction ID
+                const transactionId = currentCustomer.transactions.length > 0 ? 
+                    Math.max(...currentCustomer.transactions.map(t => t.id)) + 1 : 1;
+                
+                // Add transaction
+                currentCustomer.transactions.push({
+                    id: transactionId,
+                    date,
+                    amount,
+                    type: "credit",
+                    notes
+                });
+                
+                // Update udhari total
+                currentCustomer.udhari += amount;
+                
+                // Update display
+                document.getElementById('udhari-total').textContent = currentCustomer.udhari.toFixed(2);
+                loadTransactions();
+                
+                // Reset form
+                this.reset();
+                document.getElementById('transaction-date').value = new Date().toISOString().split('T')[0];
+                
+                // Show success message
+                alert('Credit sale recorded successfully!');
+            });
+            
+            // Add payment
+            document.getElementById('payment-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (!currentCustomer) return;
+                
+                const date = document.getElementById('payment-date').value;
+                const amount = parseFloat(document.getElementById('payment-amount').value);
+                const method = document.getElementById('payment-method').value;
+                const notes = document.getElementById('payment-notes').value;
+                
+                // Generate transaction ID
+                const transactionId = currentCustomer.transactions.length > 0 ? 
+                    Math.max(...currentCustomer.transactions.map(t => t.id)) + 1 : 1;
+                
+                // Add payment
+                currentCustomer.transactions.push({
+                    id: transactionId,
+                    date,
+                    amount,
+                    type: "payment",
+                    method,
+                    notes
+                });
+                
+                // Update udhari total
+                currentCustomer.udhari -= amount;
+                if (currentCustomer.udhari < 0) currentCustomer.udhari = 0;
+                
+                // Update display
+                document.getElementById('udhari-total').textContent = currentCustomer.udhari.toFixed(2);
+                loadPayments();
+                
+                // Reset form
+                this.reset();
+                document.getElementById('payment-date').value = new Date().toISOString().split('T')[0];
+                document.getElementById('payment-method').value = "Cash";
+                
+                // Show success message
+                alert('Payment recorded successfully!');
+            });
+            
+            // Add customer button click
+            addCustomerBtn.addEventListener('click', function() {
+                modalTitle.textContent = 'Add New Customer';
+                document.getElementById('customer-id').value = '';
+                customerForm.reset();
+                customerModal.style.display = 'flex';
+            });
+            
+            // Close modals
+            closeBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    customerModal.style.display = 'none';
+                    profileModal.style.display = 'none';
+                });
+            });
+            
+            // Close modals when clicking outside
+            window.addEventListener('click', function(e) {
+                if (e.target === customerModal || e.target === profileModal) {
+                    customerModal.style.display = 'none';
+                    profileModal.style.display = 'none';
+                }
+            });
+            
+            // Tab switching
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs
+                    tabs.forEach(t => t.classList.remove('active'));
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    
+                    // Hide all tab contents
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    // Show selected tab content
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                });
+            });
+            
+            // Search functionality
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const filteredCustomers = customers.filter(customer => 
+                    customer.name.toLowerCase().includes(searchTerm) || 
+                    customer.phone.includes(searchTerm)
+                );
+                displayCustomers(filteredCustomers);
+            });
+            
+            // Initialize
+            displayCustomers();
+        });
+    </script>
+</body>
+</html>

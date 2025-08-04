@@ -1,0 +1,72 @@
+[
+    {
+        "id": "1",
+        "name": "Premium Almonds",
+        "description": "100% natural with no additives",
+        "price": 250,
+        "image": "public/assets/Almod1.jpg"
+    },
+    {
+        "id": "2",
+        "name": "yogesh",
+        "description": "Apple laptop with M1 chip",
+        "price": 175000,
+        "image": "public/assets/mack.jpg"
+    },
+    {
+        "id": "3",
+        "name": "Dell Laptop",
+        "description": "High-performance laptop",
+        "price": 21000,
+        "image": "public/assets/laptop.jpg"
+    },
+    {
+        "id": "4",
+        "name": "Vivo T3x",
+        "description": "Smartphone with camera",
+        "price": 13500,
+        "image": "public/assets/vivot3.jpg"
+    },
+    {
+        "id": "5",
+        "name": "Wireless Headphones",
+        "description": "Noise cancelling Bluetooth headphones",
+        "price": 4500,
+        "image": "public/assets/headphones.jpg"
+    },
+    {
+        "id": "6",
+        "name": "Smart Watch",
+        "description": "Fitness tracker with heart rate monitor",
+        "price": 1200,
+        "image": "public/assets/smartwatch.jpg"
+    },
+     {
+        "id": "7",
+        "name": "coconet",
+        "description": "Fitness tracker with heart rate monitor",
+        "price": 8900,
+        "image": "public/assets/smartwatch.jpg"
+    },
+     {
+        "id": "8",
+        "name": "kishmish",
+        "description": "Fitness tracker with heart rate monitor",
+        "price": 100,
+        "image": "public/assets/smartwatch.jpg"
+    },
+     {
+        "id": "9",
+        "name": "parasute",
+        "description": "good for haire and also for recommted",
+        "price": 200,
+        "image": "public/assets/parasute.png"
+    },
+     {
+        "id": "8",
+        "name": "Smart Watch",
+        "description": "Fitness tracker with heart rate monitor",
+        "price": 1200,
+        "image": "public/assets/smartwatch.jpg"
+    }
+]

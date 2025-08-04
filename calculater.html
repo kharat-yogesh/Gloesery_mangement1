@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grocery Budget Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .calculator {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            position: relative;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9f7ef;
+            border-radius: 5px;
+            display: none;
+        }
+        .price-display {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .suggestions {
+            position: absolute;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 0 0 5px 5px;
+            z-index: 10;
+            display: none;
+        }
+        .suggestion-item {
+            padding: 8px 10px;
+            cursor: pointer;
+        }
+        .suggestion-item:hover {
+            background-color: #f0f0f0;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #2e7d32;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h1>Grocery Budget Calculator</h1>
+        
+        <div class="form-group">
+            <label for="product">Search Grocery Item:</label>
+            <input type="text" id="product" placeholder="Start typing to search...">
+            <div class="suggestions" id="suggestions"></div>
+        </div>
+        
+        <div class="form-group">
+            <label for="weight">Weight:</label>
+            <select id="weight">
+                <option value="1000">1kg</option>
+                <option value="500">500g</option>
+                <option value="250">250g</option>
+                <option value="100">100g</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="price">Price (₹):</label>
+            <input type="number" id="price" placeholder="Enter price">
+        </div>
+        
+        <div id="priceDisplay" class="price-display" style="display: none;">
+            Price: ₹<span id="selectedPrice">0</span> for <span id="selectedWeight">0g</span>
+            (<span id="pricePerUnit">₹0/g</span>)
+        </div>
+        
+        <div class="form-group">
+            <label for="budget">Your Budget (₹):</label>
+            <input type="number" id="budget" placeholder="Enter your budget">
+        </div>
+        
+        <button onclick="calculate()">Calculate</button>
+        
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        // Default grocery items database
+        const groceryItems = [
+            "Rice", "Wheat Flour", "Sugar", "Salt", "Tea Leaves", "Coffee Powder",
+            "Milk", "Curd", "Paneer", "Butter", "Ghee", "Cheese",
+            "Eggs", "Chicken", "Mutton", "Fish", "Prawns", "Eggs",
+            "Potato", "Onion", "Tomato", "Brinjal", "Ladyfinger", "Cauliflower",
+            "Cabbage", "Carrot", "Beans", "Peas", "Capsicum", "Spinach",
+            "Apple", "Banana", "Orange", "Mango", "Grapes", "Pomegranate",
+            "Watermelon", "Muskmelon", "Papaya", "Guava", "Pineapple", "Kiwi",
+            "Biscuits", "Bread", "Jam", "Butter", "Honey", "Peanut Butter",
+            "Corn Flakes", "Oats", "Poha", "Vermicelli", "Noodles", "Pasta",
+            "Toor Dal", "Moong Dal", "Chana Dal", "Urad Dal", "Masoor Dal", "Rajma",
+            "Chickpeas", "Black Gram", "Green Gram", "Kidney Beans", "Soya Chunks",
+            "Mustard Oil", "Sunflower Oil", "Olive Oil", "Coconut Oil", "Sesame Oil",
+            "Turmeric Powder", "Red Chilli Powder", "Coriander Powder", "Cumin Powder",
+            "Garam Masala", "Pepper", "Cardamom", "Cinnamon", "Cloves", "Bay Leaves",
+            "Cashew Nuts", "Almonds", "Raisins", "Walnuts", "Pistachios", "Dates",
+            "Chips", "Chocolates", "Ice Cream", "Soft Drinks", "Juice", "Mineral Water",
+            "Soap", "Shampoo", "Toothpaste", "Detergent", "Dishwash", "Toilet Cleaner",
+            "Sanitary Pads", "Tissues", "Mosquito Repellent", "Air Freshener", "Batteries"
+        ];
+
+        // DOM elements
+        const productInput = document.getElementById('product');
+        const suggestionsDiv = document.getElementById('suggestions');
+
+        // Show suggestions when typing
+        productInput.addEventListener('input', function() {
+            const input = this.value.toLowerCase();
+            if (input.length === 0) {
+                suggestionsDiv.style.display = 'none';
+                return;
+            }
+            
+            const filtered = groceryItems.filter(item => 
+                item.toLowerCase().includes(input)
+            );
+            
+            if (filtered.length > 0) {
+                suggestionsDiv.innerHTML = filtered.map(item => 
+                    `<div class="suggestion-item" onclick="selectSuggestion('${item}')">${item}</div>`
+                ).join('');
+                suggestionsDiv.style.display = 'block';
+            } else {
+                suggestionsDiv.style.display = 'none';
+            }
+        });
+
+        // Select a suggestion
+        function selectSuggestion(item) {
+            productInput.value = item;
+            suggestionsDiv.style.display = 'none';
+        }
+
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (e.target !== productInput) {
+                suggestionsDiv.style.display = 'none';
+            }
+        });
+
+        // Function to format weight (convert grams to kg when appropriate)
+        function formatWeight(grams) {
+            if (grams >= 1000) {
+                const kg = grams / 1000;
+                // Show 1 decimal place only if needed
+                return kg % 1 === 0 ? `${kg}kg` : `${kg.toFixed(1)}kg (${grams}g)`;
+            }
+            return `${grams}g`;
+        }
+
+        // Calculation function
+        function calculate() {
+            // Get input values
+            const product = document.getElementById('product').value;
+            const weight = parseInt(document.getElementById('weight').value);
+            const price = parseFloat(document.getElementById('price').value);
+            const budget = parseFloat(document.getElementById('budget').value);
+            
+            // Validate inputs
+            if (!product || isNaN(price) || isNaN(budget) || price <= 0 || budget <= 0) {
+                alert("Please fill all fields with valid values");
+                return;
+            }
+            
+            // Calculate price per gram
+            const pricePerGram = price / weight;
+            const maxWeight = Math.floor(budget / pricePerGram);
+            
+            // Display results
+            const resultDiv = document.getElementById('result');
+            let resultHTML = `<strong>For ${product}:</strong><br>`;
+            
+            if (budget >= price) {
+                const fullUnits = Math.floor(budget / price);
+                const remaining = budget - (fullUnits * price);
+                
+                resultHTML += `You can buy <span class="highlight">${fullUnits} full package(s) (${formatWeight(fullUnits * weight)})</span><br>`;
+                
+                if (remaining > 0) {
+                    const extraWeight = Math.floor(remaining / pricePerGram);
+                    resultHTML += `Plus an additional <span class="highlight">${formatWeight(extraWeight)}`;
+                }
+            } else {
+                resultHTML += `You can buy <span class="highlight">${formatWeight(maxWeight)}</span> (₹${budget.toFixed(2)} of ₹${price.toFixed(2)} full package)`;
+            }
+            
+            resultDiv.innerHTML = resultHTML;
+            resultDiv.style.display = 'block';
+        }
+        
+        // Show price when weight or price changes
+        document.getElementById('weight').addEventListener('change', updatePrice);
+        document.getElementById('price').addEventListener('input', updatePrice);
+        
+        function updatePrice() {
+            const weight = document.getElementById('weight').value;
+            const price = document.getElementById('price').value;
+            const priceDisplay = document.getElementById('priceDisplay');
+            
+            if (price && !isNaN(price) && price > 0) {
+                document.getElementById('selectedPrice').textContent = price;
+                document.getElementById('selectedWeight').textContent = 
+                    weight >= 1000 ? `${weight/1000}kg` : `${weight}g`;
+                document.getElementById('pricePerUnit').textContent = 
+                    `₹${(price/weight).toFixed(2)}/g`;
+                priceDisplay.style.display = 'block';
+            } else {
+                priceDisplay.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
